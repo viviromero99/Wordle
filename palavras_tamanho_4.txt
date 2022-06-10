@@ -1,5 +1,6 @@
 abre
 acre
+açai
 açao
 adia
 agil
@@ -34,6 +35,7 @@ bolo
 bota
 boto
 brio
+cafe
 cama
 caos
 cana

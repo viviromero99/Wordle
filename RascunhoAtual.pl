@@ -1,3 +1,55 @@
+% Palavras por Tamanho
+
+% Tamanho 4
+len_palavra(4, seta).
+len_palavra(4, roda).
+len_palavra(4, vela).
+len_palavra(4, alvo).
+len_palavra(4, gato).
+
+% Tamanho 5
+len_palavra(5, terra).
+len_palavra(5, trapo).
+len_palavra(5, visor).
+len_palavra(5, capuz).
+len_palavra(5, vento).
+
+% Tamanho 6
+len_palavra(6, hostil).
+len_palavra(6, pressa).
+len_palavra(6, nativo).
+len_palavra(6, forjar).
+len_palavra(6, aurora).
+
+% Tamanho 7
+len_palavra(7, cultura).
+len_palavra(7, ousadia).
+len_palavra(7, mancebo).
+len_palavra(7, advento).
+len_palavra(7, conexao).
+
+% Identificadores das Palavras
+id_palavra(0, seta).
+id_palavra(1, roda).
+id_palavra(2, vela).
+id_palavra(3, alvo).
+id_palavra(4, gato).
+id_palavra(0, terra).
+id_palavra(1, trapo).
+id_palavra(2, visor).
+id_palavra(3, capuz).
+id_palavra(4, vento).
+id_palavra(0, hostil).
+id_palavra(1, pressa).
+id_palavra(2, nativo).
+id_palavra(3, forjar).
+id_palavra(4, aurora).
+id_palavra(0, cultura).
+id_palavra(1, ousadia).
+id_palavra(2, mancebo).
+id_palavra(3, advento).
+id_palavra(4, conexao).
+
 % Converte uma lista para String
 str_toList(STR, LIST) :- atom_chars(STR, LIST).
 
@@ -59,51 +111,14 @@ elemento_pos_errado(PALAVRA_T, ELM_ERRADO, ELM_POS_CORRETA, ELM_LIST) :-
     subtrai_listas(ELM_POS_ERRADOS, ELM_ERRADO, ELM_LIST),
     !.
 
-% Escolhe palavra do dia
-palavra_dia(TAM)  :-
-	seleciona_palavra(TAM, LINHAS, ID),
-    format('Obaaa! Já temos uma palavra para você!'),
-    nl.
+% Gera palavra do dia
+palavra_dia(TAM, PALAVRA)  :-
+	len_palavra(TAM, PALAVRA),
+	random_between(0,5,ID),
+	id_palavra(ID, PALAVRA),
+	!.
 
-% seleciona palavra por tamanho aleatóriamente
-seleciona_palavra(TAM, LINHAS, X)  :-
-	(4 = TAM ->  open('palavras_tamanho_4.txt', read, Str), random(0, 200, X);
-    5 = TAM ->  open('palavras_tamanho_5.txt', read, Str), random(0, 200, X);
-    6 = TAM ->  open('palavras_tamanho_6.txt', read, Str), random(0, 200, X);
-    7 = TAM ->  open('palavras_tamanho_7.txt', read, Str), random(0, 200, X))->
-    read_file(Str, LINHAS),
-    close(Str),
-    nl.
-
-read_file(Stream,[]):-
-    at_end_of_stream(Stream).
-   
-read_file(Stream,[X|L]):-
-    \+  at_end_of_stream(Stream),
-    read(Stream,X),
-    read_file(Stream,L).
-
-% valida palpite inputado pelo usuário
-valida_palpite(TAM, LINHAS, PALPITE)  :-
-	(4 = TAM ->  open('palavras_tamanho_4.txt', read, Str);
-    5 = TAM ->  open('palavras_tamanho_5.txt', read, Str);
-    6 = TAM ->  open('palavras_tamanho_6.txt', read, Str);
-    7 = TAM ->  open('palavras_tamanho_7.txt', read, Str))->
-    read_file_valida(Str, LINHAS, PALPITE),
-    close(Str),
-    nl.
-
-read_file_valida(Stream,[], PALPITE):-
-    at_end_of_stream(Stream).
-   
-read_file_valida(Stream,[X|L], PALPITE):-
-    \+  at_end_of_stream(Stream),
-    read(Stream,X),
-    X is PALPITE ->  , ! ;
-    read_file(Stream,L).
-    
-
-% Realiza a verificacao da entrada
+% Realiza a verificacao da entrada com palavra do dia
 palavra_corresp(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
     elemento_errado(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO),
     elemento_pos_correta(PALAVRA_TESTE, PALAVRA_DIA, ELM_POS_CORRETA),
@@ -112,25 +127,22 @@ palavra_corresp(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS
     !.
 
 ler_tam_palavra(TAM_PALAVRA) :-
-  format('Qual o tamanho da palavra que gostaria de adivinhar?'),
+  write('Qual o tamanho da palavra que gostaria de adivinhar?'),
   nl,
-  format('Lembrando as opcoes sao 4,5,6 e 7'),
+  write('Lembrando que as opcoes sao 4, 5, 6 ou 7 letras (Digite por exemplo: 5.)'),
   nl,
   read(TAM_PALAVRA),
-  TAM_PALAVRA < 8 -> nl, ! ;
-    format('Essa opcão não existe.'),
-  	nl,
-    ler_tam_palavra(TAM_PALAVRA),
-  TAM_PALAVRA > 3 ->  nl, ! ; 
-    format('Essa opcão não existe.'),
-  	nl,
-   	ler_tam_palavra(TAM_PALAVRA),
-   palavra_dia(TAM_PALAVRA).
+  integer(TAM_PALAVRA),
+  intervalo(TAM_PALAVRA).
+
+intervalo(TAM_PALAVRA) :-
+    3 < TAM_PALAVRA, 8 > TAM_PALAVRA.
 
 ler_palavra(TAMANHO, PALAVRA) :-
-    format('Qual seu palpite?'),
+    write('Qual seu palpite?'),
     nl,
     format('Lembrando que a palavra deve ter tamanho ~q .', [TAMANHO]),
+    nl,
     nl,
     read(RESPOSTA), 
    	atom_string(RESPOSTA, PALAVRA),
@@ -139,25 +151,25 @@ ler_palavra(TAMANHO, PALAVRA) :-
     RESPOSTA_LEN =:= TAMANHO -> ! ;
     	format('Palavra deve ter tamanho ~q .', [TAMANHO]),
     	nl,
-    	format('Tente novamente!'),
+    	write('Tente novamente!'),
     	nl,
     	ler_palavra(TAMANHO, PALAVRA).
 
 validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     len(ELM_ERRADO, ELM_ERRADO_LEN),
 	ELM_ERRADO_LEN > 0 -> 
-    	format('Poxa, você errou a palavra! Tente novamente!'),
+    	write('Poxa, você errou a palavra! Tente novamente!'),
         nl,
         VITORIA is 0,
     	!
     ;
     	len(ELM_POS_ERRADA, ELM_POS_ERRADA_LEN),
     	ELM_POS_ERRADA_LEN > 0 -> 
-    		format('Poxa, você errou a palavra! Tente novamente!'),
+    		write('Poxa, você errou a palavra! Tente novamente!'),
     		nl,
     		VITORIA is 0, !
     	;
-    		format('Parabéns! Você acertou a palavra!'),
+    		write('Parabéns! Você acertou a palavra!'),
     		nl,
     		VITORIA is 1
     .
@@ -178,17 +190,24 @@ partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
 	VITORIA =:= 1 -> ! ;
     	partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA).
 
-main :-
-    format('Olá, jogador!'),
+jogar(TAM_PALAVRA) :-
+    palavra_dia(TAM_PALAVRA, X),
     nl,
-    format('Preparado para uma partida?'),
+    write('Obaaa! Ja temos uma palavra para voce!'),
     nl,
-  	ler_tam_palavra(TAM_PALAVRA),
-    palavra_dia(TAM_PALAVRA, PALAVRA),
-    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+    partida(TAM_PALAVRA, X, X, X, X),
     nl,
-    format(' PALAVRA CORRETA: ~q .', [PALAVRA]),
-    nl,
-    nl,
-    nl,
+    write('PALAVRA CORRETA: ~q .', [PALAVRA]),
     nl.
+
+main :-
+    write('Ola, jogador!'),
+    nl,
+    write('Preparado para uma partida?'),
+    nl,
+    ler_tam_palavra(TAM_PALAVRA) -> jogar(TAM_PALAVRA);
+    nl,
+    write('Essa opcao nao existe.'),
+    nl,
+    nl,
+    main.

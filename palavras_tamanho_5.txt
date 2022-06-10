@@ -175,3 +175,5 @@ genio
 genia
 tenis
 lenço
+linda
+lindo
