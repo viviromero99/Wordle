@@ -131,9 +131,9 @@ ler_tam_palavra(TAM_PALAVRA) :-
   nl,
   write('Lembrando que as opcoes sao 4, 5, 6 ou 7 letras (Digite por exemplo: 5.)'),
   nl,
-  read(TAM_PALAVRA),
-  integer(TAM_PALAVRA),
-  intervalo(TAM_PALAVRA).
+    read(TAM_PALAVRA),
+    integer(TAM_PALAVRA),
+    intervalo(TAM_PALAVRA).
 
 intervalo(TAM_PALAVRA) :-
     3 < TAM_PALAVRA, 8 > TAM_PALAVRA.
@@ -149,63 +149,93 @@ ler_palavra(TAMANHO, PALAVRA) :-
     str_toList(PALAVRA, PALAVRA_LIST),
     len(PALAVRA_LIST, RESPOSTA_LEN),
     RESPOSTA_LEN =:= TAMANHO -> ! ;
-    	format('Palavra deve ter tamanho ~q .', [TAMANHO]),
+    	nl,
+        format('Palavra deve ter tamanho ~q .', [TAMANHO]),
     	nl,
     	write('Tente novamente!'),
     	nl,
     	ler_palavra(TAMANHO, PALAVRA).
 
-validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
+validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA) :-
+    TENTATIVAS < 1 ->
+        format('Poxa, você errou a palavra e não restam mais tentativas!'),
+        nl,
+        nl,
+        format('PALAVRA CORRETA: ~q .', [PALAVRA]),
+        nl
+        nl,
+        VITORIA is 0,
+        terminar_jogo(VITORIA);
     len(ELM_ERRADO, ELM_ERRADO_LEN),
 	ELM_ERRADO_LEN > 0 -> 
-    	write('Poxa, você errou a palavra! Tente novamente!'),
+    	format('Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [TENTATIVAS]),
         nl,
         VITORIA is 0,
     	!
     ;
     	len(ELM_POS_ERRADA, ELM_POS_ERRADA_LEN),
     	ELM_POS_ERRADA_LEN > 0 -> 
-    		write('Poxa, você errou a palavra! Tente novamente!'),
+    		format('Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [TENTATIVAS]),
     		nl,
     		VITORIA is 0, !
     	;
     		write('Parabéns! Você acertou a palavra!'),
     		nl,
+            nl,
     		VITORIA is 1
+            terminar_jogo(VITORIA)
     .
 			
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
-    format('Elementos errados: ~q .', [ELM_ERRADO]),
+    ansi_format([bold,fg(red)],'Elementos errados: ~q .', [ELM_ERRADO]),
     nl,
-    format('Elementos certos na posicao errada: ~q .', [ELM_POS_ERRADA]),
+    ansi_format([bold,fg(orange)],'Elementos certos na posicao errada: ~q .', [ELM_POS_ERRADA]),
     nl,
-    format('Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
+    ansi_format([bold,fg(green)],'Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
     nl.
 
-partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
+partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, TENTATIVAS) :-
 	ler_palavra(TAM_PALAVRA, PALAVRA_T),
 	palavra_corresp(PALAVRA_T, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
     mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA),
-    validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA),
+    validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA),
 	VITORIA =:= 1 -> ! ;
-    	partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA).
+        RESTO_TENTATIVAS is TENTATIVAS - 1,
+    	partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, RESTO_TENTATIVAS).
 
-jogar(TAM_PALAVRA) :-
-    palavra_dia(TAM_PALAVRA, X),
+
+terminar_jogo(RESULTADO) :-
+    RESULTADO =:= 1 ->
+        write('Voce ganhou o jogo! Gostaria de jogar novamente? (Digite sim. ou nao.)');
+    RESULTADO =:= 0 ->   
+        write('Voce perdeu o jogo! Mas não desanime, que tal jogar novamente? (Digite sim. ou nao.)');
+    nl,
+    read(RESPOSTA),
+    RESPOSTA = "sim" ->
+        nl,
+        main;
+    RESPOSTA = "nao" ->
+        halt(0);
+    write('Essa opcao nao existe.'),
+    nl,
+    nl,
+    terminar_jogo(RESULTADO).
+
+
+comecar_jogo(TAM_PALAVRA) :-
+    palavra_dia(TAM_PALAVRA, PALAVRA),
     nl,
     write('Obaaa! Ja temos uma palavra para voce!'),
     nl,
-    partida(TAM_PALAVRA, X, X, X, X),
-    nl,
-    write('PALAVRA CORRETA: ~q .', [PALAVRA]),
-    nl.
+    partida(TAM_PALAVRA, PALAVRA, PALAVRA, PALAVRA, PALAVRA, 6).
 
 main :-
     write('Ola, jogador!'),
     nl,
     write('Preparado para uma partida?'),
     nl,
-    ler_tam_palavra(TAM_PALAVRA) -> jogar(TAM_PALAVRA);
+    ler_tam_palavra(TAM_PALAVRA) -> 
+        comecar_jogo(TAM_PALAVRA);
     nl,
     write('Essa opcao nao existe.'),
     nl,
