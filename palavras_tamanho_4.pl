@@ -402,4 +402,4 @@ word(numero,sete,4,401).
 word(numero,oito,4,402).
 word(numero,nove,4,403).
 word(numero,onze,4,404).
-word(numero,doze,4,404).
+word(numero,doze,4,405).

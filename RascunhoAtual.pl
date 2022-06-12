@@ -1,3 +1,75 @@
+:- consult([palavras_tamanho_4,palavras_tamanho_5,palavras_tamanho_6,palavras_tamanho_7]).
+
+main :-
+    write('Ola, jogador!'),
+    nl,
+    write('Preparado para uma partida?'),
+    nl,
+    ler_tam_palavra(TAM_PALAVRA) -> 
+        jogar(TAM_PALAVRA);
+    nl,
+    write('Essa opcao nao existe.'),
+    nl,
+    nl,
+    main.
+
+ler_tam_palavra(TAM_PALAVRA) :-
+  write('Qual o tamanho da palavra que gostaria de adivinhar?'),
+  nl,
+  write('Lembrando que as opcoes sao 4, 5, 6 ou 7 letras (Digite por exemplo: 5.)'),
+  nl,
+    read(TAM_PALAVRA),
+    integer(TAM_PALAVRA),
+    intervalo(TAM_PALAVRA).
+
+intervalo(TAM_PALAVRA) :-
+    3 < TAM_PALAVRA, 8 > TAM_PALAVRA.
+
+jogar(TAM_PALAVRA) :-
+    palavra_dia(TAM_PALAVRA, PALAVRA, TIPO),
+    nl,
+    write('Obaaa! Ja temos uma palavra para voce!'),
+    nl,
+    nl,
+    format('Dica! Ela é do tipo: ~q .', [TIPO]),
+    nl,
+    partida(TAM_PALAVRA, PALAVRA, PALAVRA, PALAVRA, PALAVRA, 6).
+
+% Gera palavra do dia
+palavra_dia(TAM, PALAVRA, TIPO)  :-
+    random_between(1,405,ID),
+    word(TIPO, PALAVRA, TAM, ID),
+    !.
+
+partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, TENTATIVAS) :-
+	ler_palavra(TAM_PALAVRA, PALPITE),
+	palavra_corresp(PALPITE, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+    mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA),
+    validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA),
+	VITORIA =:= 1 -> ! ;
+        RESTO_TENTATIVAS is TENTATIVAS - 1,
+    	partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, RESTO_TENTATIVAS).
+
+ler_palavra(TAMANHO, PALAVRA) :-
+    write('Qual seu palpite?'),
+    nl,
+    format('Lembrando que a palavra deve ter tamanho ~q .', [TAMANHO]),
+    nl,
+    nl,
+    read(RESPOSTA), 
+   	atom_string(RESPOSTA, PALAVRA),
+    str_toList(PALAVRA, PALAVRA_LIST),
+    len(PALAVRA_LIST, RESPOSTA_LEN),
+    RESPOSTA_LEN =:= TAMANHO -> ! ;
+    	nl,
+        format('Palavra deve ter tamanho ~q .', [TAMANHO]),
+    	nl,
+    	write('Tente novamente!'),
+    	nl,
+        nl,
+    	ler_palavra(TAMANHO, PALAVRA).
+
+
 % Palavras por Tamanho
 
 % Tamanho 4
@@ -111,13 +183,6 @@ elemento_pos_errado(PALAVRA_T, ELM_ERRADO, ELM_POS_CORRETA, ELM_LIST) :-
     subtrai_listas(ELM_POS_ERRADOS, ELM_ERRADO, ELM_LIST),
     !.
 
-% Gera palavra do dia
-palavra_dia(TAM, PALAVRA)  :-
-	len_palavra(TAM, PALAVRA),
-	random_between(0,5,ID),
-	id_palavra(ID, PALAVRA),
-	!.
-
 % Realiza a verificacao da entrada com palavra do dia
 palavra_corresp(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
     elemento_errado(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO),
@@ -125,36 +190,6 @@ palavra_corresp(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS
     format_pos_list(ELM_POS_CORRETA, ELM_POS_CORRETA_LIST),
     elemento_pos_errado(PALAVRA_TESTE, ELM_ERRADO, ELM_POS_CORRETA_LIST, ELM_POS_ERRADA),
     !.
-
-ler_tam_palavra(TAM_PALAVRA) :-
-  write('Qual o tamanho da palavra que gostaria de adivinhar?'),
-  nl,
-  write('Lembrando que as opcoes sao 4, 5, 6 ou 7 letras (Digite por exemplo: 5.)'),
-  nl,
-    read(TAM_PALAVRA),
-    integer(TAM_PALAVRA),
-    intervalo(TAM_PALAVRA).
-
-intervalo(TAM_PALAVRA) :-
-    3 < TAM_PALAVRA, 8 > TAM_PALAVRA.
-
-ler_palavra(TAMANHO, PALAVRA) :-
-    write('Qual seu palpite?'),
-    nl,
-    format('Lembrando que a palavra deve ter tamanho ~q .', [TAMANHO]),
-    nl,
-    nl,
-    read(RESPOSTA), 
-   	atom_string(RESPOSTA, PALAVRA),
-    str_toList(PALAVRA, PALAVRA_LIST),
-    len(PALAVRA_LIST, RESPOSTA_LEN),
-    RESPOSTA_LEN =:= TAMANHO -> ! ;
-    	nl,
-        format('Palavra deve ter tamanho ~q .', [TAMANHO]),
-    	nl,
-    	write('Tente novamente!'),
-    	nl,
-    	ler_palavra(TAMANHO, PALAVRA).
 
 validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA) :-
     TENTATIVAS < 1 ->
@@ -165,7 +200,7 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA) :-
         nl
         nl,
         VITORIA is 0,
-        terminar_jogo(VITORIA);
+        terminar(VITORIA);
     len(ELM_ERRADO, ELM_ERRADO_LEN),
 	ELM_ERRADO_LEN > 0 -> 
     	format('Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [TENTATIVAS]),
@@ -183,7 +218,7 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA) :-
     		nl,
             nl,
     		VITORIA is 1
-            terminar_jogo(VITORIA)
+            terminar(VITORIA)
     .
 			
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
@@ -194,17 +229,7 @@ mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
     ansi_format([bold,fg(green)],'Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
     nl.
 
-partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, TENTATIVAS) :-
-	ler_palavra(TAM_PALAVRA, PALAVRA_T),
-	palavra_corresp(PALAVRA_T, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
-    mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA),
-    validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA),
-	VITORIA =:= 1 -> ! ;
-        RESTO_TENTATIVAS is TENTATIVAS - 1,
-    	partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, RESTO_TENTATIVAS).
-
-
-terminar_jogo(RESULTADO) :-
+terminar(RESULTADO) :-
     RESULTADO =:= 1 ->
         write('Voce ganhou o jogo! Gostaria de jogar novamente? (Digite sim. ou nao.)');
     RESULTADO =:= 0 ->   
@@ -219,25 +244,5 @@ terminar_jogo(RESULTADO) :-
     write('Essa opcao nao existe.'),
     nl,
     nl,
-    terminar_jogo(RESULTADO).
+    terminar(RESULTADO).
 
-
-comecar_jogo(TAM_PALAVRA) :-
-    palavra_dia(TAM_PALAVRA, PALAVRA),
-    nl,
-    write('Obaaa! Ja temos uma palavra para voce!'),
-    nl,
-    partida(TAM_PALAVRA, PALAVRA, PALAVRA, PALAVRA, PALAVRA, 6).
-
-main :-
-    write('Ola, jogador!'),
-    nl,
-    write('Preparado para uma partida?'),
-    nl,
-    ler_tam_palavra(TAM_PALAVRA) -> 
-        comecar_jogo(TAM_PALAVRA);
-    nl,
-    write('Essa opcao nao existe.'),
-    nl,
-    nl,
-    main.
