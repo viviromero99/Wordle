@@ -132,14 +132,15 @@ ler_tam_palavra(TAM_PALAVRA) :-
   format('Lembrando as opcoes sao 4,5,6 e 7'),
   nl,
   read(TAM_PALAVRA),
-  TAM_PALAVRA < 8 -> nl, ! ;
-    format('Essa opcão não existe.'),
-  	nl,
-    ler_tam_palavra(TAM_PALAVRA),
-  TAM_PALAVRA > 3 ->  nl, ! ; 
+  integer(TAM_PALAVRA),
+  intervalo(TAM_PALAVRA) -> !;
     format('Essa opcão não existe.'),
   	nl,
     ler_tam_palavra(TAM_PALAVRA).
+
+
+intervalo(TAM_PALAVRA) :-
+    4 =< TAM_PALAVRA, 7 >= TAM_PALAVRA.
 
 ler_palavra(TAMANHO, PALAVRA) :-
     format('Qual seu palpite?'),
