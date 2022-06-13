@@ -92,46 +92,45 @@ ler_tam_palavra(TAM_PALAVRA) :-
   	nl,
     ler_tam_palavra(TAM_PALAVRA).
 
+validar_tamanho(PALAVRA, TAMANHO) :-
+    str_toList(PALAVRA, PALAVRA_LIST),
+    len(PALAVRA_LIST, RESPOSTA_LEN),
+    RESPOSTA_LEN =:= TAMANHO .
+
+validar_dicionario(RESPOSTA, TAMANHO) :-
+    word(_TIPO, RESPOSTA, TAMANHO, ID),
+    ID > 0 .
+
+validar_palavra(RESPOSTA, PALAVRA, TAMANHO) :-
+    validar_tamanho(PALAVRA, TAMANHO),
+    validar_dicionario(RESPOSTA, TAMANHO) .
+
 ler_palavra(TAMANHO, PALAVRA) :-
     format('Qual seu palpite?'),
     nl,
-    read(RESPOSTA), 
-   	atom_string(RESPOSTA, PALAVRA),
-
-    validar_palavra(TAMANHO, RESPOSTA) ->
+    read(RESPOSTA),
+    atom_string(RESPOSTA, PALAVRA),
+    validar_palavra(RESPOSTA, PALAVRA, TAMANHO) ->
         ! ;
-        format('Essa palavra não existe no dicionario.'),
-        ler_palavra(TAMANHO, PALAVRA)
-
-    str_toList(PALAVRA, PALAVRA_LIST),
-    len(PALAVRA_LIST, RESPOSTA_LEN),
-    RESPOSTA_LEN =:= TAMANHO ->
-        ! ;
-        format('Palavra deve ter tamanho ~q .', [TAMANHO]),
+        nl,
+        format('Palavra contém tamanho diferente de ~q ou não consta no nosso sistema.', [TAMANHO]),
         nl,
         format('Tente novamente!'),
         nl,
-        ler_palavra(TAMANHO, PALAVRA).
-
-validar_palavra(TAMANHO, PALAVRA) :-
-    word(_TIPO, PALAVRA, TAMANHO, ID),
-    ID > 0.
+        ler_palavra(TAMANHO, PALAVRA) .
 
 validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     len(ELM_ERRADO, ELM_ERRADO_LEN),
 	ELM_ERRADO_LEN > 0 ->
         VITORIA is 0,
-    	!
-    ;
+    	! ;
     	len(ELM_POS_ERRADA, ELM_POS_ERRADA_LEN),
     	ELM_POS_ERRADA_LEN > 0 -> 
     		VITORIA is 0,
-            !
-    	;
+            ! ;
     		format('Parabéns! Você acertou a palavra!'),
     		nl,
-    		VITORIA is 1
-    .
+    		VITORIA is 1 .
 			
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
     format('Elementos errados: ~q .', [ELM_ERRADO]),
@@ -143,10 +142,10 @@ mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
 
 partida(TAM_PALAVRA, PALAVRA, TENTATIVAS) :-
 	ler_palavra(TAM_PALAVRA, PALAVRA_T),
-	palavra_corresp(PALAVRA_T, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+    palavra_corresp(PALAVRA_T, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
     mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA),
     validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA),
-	VITORIA =:= 1 ->
+    VITORIA =:= 1 ->
         ! ;
         TENTATIVAS =:= 1 ->
             format('Poxa, você errou a palavra e não restam mais tentativas!'),
@@ -155,7 +154,7 @@ partida(TAM_PALAVRA, PALAVRA, TENTATIVAS) :-
             RESTO_TENTATIVAS is TENTATIVAS - 1,
             format('Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [RESTO_TENTATIVAS]),
             nl,
-    	    partida(TAM_PALAVRA, PALAVRA, RESTO_TENTATIVAS).
+            partida(TAM_PALAVRA, PALAVRA, RESTO_TENTATIVAS).
 
 jogar() :-
     format('Olá, jogador!'),
