@@ -113,7 +113,7 @@ ler_palavra(TAMANHO, PALAVRA) :-
     validar_palavra(RESPOSTA, PALAVRA, TAMANHO) ->
         ! ;
         nl,
-        format('Palavra contém tamanho diferente de ~q ou não consta no nosso sistema.', [TAMANHO]),
+        format('Palavra contém tamanho diferente de ~q ou não consta no nosso dicionario.', [TAMANHO]),
         nl,
         format('Tente novamente!'),
         nl,
@@ -133,11 +133,12 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     		VITORIA is 1 .
 			
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
-    format('Elementos errados: ~q .', [ELM_ERRADO]),
     nl,
-    format('Elementos certos na posicao errada: ~q .', [ELM_POS_ERRADA]),
+    ansi_format([bold,fg(red)],'Elementos errados: ~q ', [ELM_ERRADO]),
     nl,
-    format('Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
+    ansi_format([bold,fg(yellow)],'Elementos certos na posicao errada: ~q ', [ELM_POS_ERRADA]),
+    nl,
+    ansi_format([bold,fg(green)],'Elementos certos na posicao certa: ~q ', [ELM_POS_CORRETA]),
     nl.
 
 partida(TAM_PALAVRA, PALAVRA, TENTATIVAS) :-

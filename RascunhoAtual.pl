@@ -222,11 +222,12 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA, TENTATIVAS, PALAVRA) :-
     .
 			
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
-    ansi_format([bold,fg(red)],'Elementos errados: ~q .', [ELM_ERRADO]),
     nl,
-    ansi_format([bold,fg(orange)],'Elementos certos na posicao errada: ~q .', [ELM_POS_ERRADA]),
+    ansi_format([bold,fg(red)],'Elementos errados: ~q ', [ELM_ERRADO]),
     nl,
-    ansi_format([bold,fg(green)],'Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
+    ansi_format([bold,fg(yellow)],'Elementos certos na posicao errada: ~q ', [ELM_POS_ERRADA]),
+    nl,
+    ansi_format([bold,fg(green)],'Elementos certos na posicao certa: ~q ', [ELM_POS_CORRETA]),
     nl.
 
 terminar(RESULTADO) :-
