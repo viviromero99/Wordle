@@ -86,7 +86,7 @@ ler_tam_palavra(TAM_PALAVRA) :-
   nl,
   format('Qual o tamanho da palavra que gostaria de adivinhar?'),
   nl,
-  format('Lembrando as opcoes sao 4,5,6 ou 7 '),
+  format('Lembrando que as opcoes sao 4,5,6 ou 7 '),
   nl,
   read_string(user_input, ".", "\r\t\n ", _SEP, TAM_STRING),
   number_string(TAM_PALAVRA, TAM_STRING),
