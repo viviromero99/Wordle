@@ -76,7 +76,8 @@ palavra_corresp(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS
     !.
 
 intervalo(TAM_PALAVRA) :-
-    4 =< TAM_PALAVRA, 7 >= TAM_PALAVRA.
+    4 =< TAM_PALAVRA,
+    7 >= TAM_PALAVRA.
 
 ler_tam_palavra(TAM_PALAVRA) :-
   format('Qual o tamanho da palavra que gostaria de adivinhar?'),
@@ -93,8 +94,6 @@ ler_tam_palavra(TAM_PALAVRA) :-
 ler_palavra(TAMANHO, PALAVRA) :-
     format('Qual seu palpite?'),
     nl,
-    format('Lembrando que a palavra deve ter tamanho ~q .', [TAMANHO]),
-    nl,
     read(RESPOSTA), 
    	atom_string(RESPOSTA, PALAVRA),
     str_toList(PALAVRA, PALAVRA_LIST),
@@ -109,16 +108,12 @@ ler_palavra(TAMANHO, PALAVRA) :-
 
 validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     len(ELM_ERRADO, ELM_ERRADO_LEN),
-	ELM_ERRADO_LEN > 0 -> 
-    	format('Poxa, você errou a palavra! Tente novamente!'),
-        nl,
+	ELM_ERRADO_LEN > 0 ->
         VITORIA is 0,
     	!
     ;
     	len(ELM_POS_ERRADA, ELM_POS_ERRADA_LEN),
     	ELM_POS_ERRADA_LEN > 0 -> 
-    		format('Poxa, você errou a palavra! Tente novamente!'),
-    		nl,
     		VITORIA is 0, !
     	;
     		format('Parabéns! Você acertou a palavra!'),
@@ -134,13 +129,21 @@ mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
     format('Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
     nl.
 
-partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
+partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, TENTATIVAS) :-
 	ler_palavra(TAM_PALAVRA, PALAVRA_T),
 	palavra_corresp(PALAVRA_T, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
     mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA),
     validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA),
-	VITORIA =:= 1 -> ! ;
-    	partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA).
+	VITORIA =:= 1 ->
+        ! ;
+        TENTATIVAS =:= 1 ->
+            format('Poxa, você errou a palavra e não restam mais tentativas!'),
+            nl,
+            !;
+            RESTO_TENTATIVAS is TENTATIVAS - 1,
+            format('Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [RESTO_TENTATIVAS]),
+            nl,
+    	    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, RESTO_TENTATIVAS).
 
 jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
     format('Olá, jogador!'),
@@ -153,17 +156,20 @@ jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
     nl,
     format('Dica! Ela é do tipo: ~q .', [TIPO]),
     nl,
-    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, 6),
     format(' PALAVRA CORRETA: ~q .', [PALAVRA]),
     nl,
     nl,
-    nl,
-    nl.
+    jogar_novamente(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA).
+
+jogar_novamente(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
+    write('Você gostaria de jogar novamente? (sim ou nao)'),
+    read(RESPOSTA),
+    RESPOSTA = 'nao' ->
+        !;
+        jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA).
 
 main :-
     jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
-    write('Você gostaria de jogar novamente? (sim ou nao)'),
-    read(RESPOSTA),
-    RESPOSTA =:= 'sim' ->
-        jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
-        !.
+    halt(0) .
+    
