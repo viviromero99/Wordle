@@ -75,6 +75,9 @@ palavra_corresp(PALAVRA_TESTE, PALAVRA_DIA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS
     elemento_pos_errado(PALAVRA_TESTE, ELM_ERRADO, ELM_POS_CORRETA_LIST, ELM_POS_ERRADA),
     !.
 
+intervalo(TAM_PALAVRA) :-
+    4 =< TAM_PALAVRA, 7 >= TAM_PALAVRA.
+
 ler_tam_palavra(TAM_PALAVRA) :-
   format('Qual o tamanho da palavra que gostaria de adivinhar?'),
   nl,
