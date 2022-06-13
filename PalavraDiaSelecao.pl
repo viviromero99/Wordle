@@ -86,7 +86,8 @@ ler_tam_palavra(TAM_PALAVRA) :-
   nl,
   read(TAM_PALAVRA),
   integer(TAM_PALAVRA),
-  intervalo(TAM_PALAVRA) -> !;
+  intervalo(TAM_PALAVRA) -> 
+    ! ;
     format('Essa opcão não existe.'),
   	nl,
     ler_tam_palavra(TAM_PALAVRA).
@@ -96,27 +97,25 @@ ler_palavra(TAMANHO, PALAVRA) :-
     nl,
     read(RESPOSTA), 
    	atom_string(RESPOSTA, PALAVRA),
+
+    validar_palavra(TAMANHO, RESPOSTA) ->
+        ! ;
+        format('Essa palavra não existe no dicionario.'),
+        ler_palavra(TAMANHO, PALAVRA)
+
     str_toList(PALAVRA, PALAVRA_LIST),
     len(PALAVRA_LIST, RESPOSTA_LEN),
     RESPOSTA_LEN =:= TAMANHO ->
         ! ;
         format('Palavra deve ter tamanho ~q .', [TAMANHO]),
-    	nl,
-    	format('Tente novamente!'),
-    	nl,
-    	ler_palavra(TAMANHO, PALAVRA).
-
-validar_palavra(TAMANHO, PALAVRA, TIPO) :-
-    ID is 0,
-    word(TIPO, PALAVRA, TAMANHO, ID),
-    ID > 0 -> 
-        ! ;
-        format('Essa palavra não existe no dicionario.'),
         nl,
         format('Tente novamente!'),
         nl,
-        nl,
         ler_palavra(TAMANHO, PALAVRA).
+
+validar_palavra(TAMANHO, PALAVRA) :-
+    word(_TIPO, PALAVRA, TAMANHO, ID),
+    ID > 0.
 
 validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     len(ELM_ERRADO, ELM_ERRADO_LEN),
@@ -126,7 +125,8 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     ;
     	len(ELM_POS_ERRADA, ELM_POS_ERRADA_LEN),
     	ELM_POS_ERRADA_LEN > 0 -> 
-    		VITORIA is 0, !
+    		VITORIA is 0,
+            !
     	;
     		format('Parabéns! Você acertou a palavra!'),
     		nl,
@@ -134,16 +134,15 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     .
 			
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
-    ansi_format([bold,fg(red)],'Elementos errados: ~q .', [ELM_ERRADO]),
+    format('Elementos errados: ~q .', [ELM_ERRADO]),
     nl,
-    ansi_format([bold,fg(yellow)],'Elementos certos na posicao errada: ~q .', [ELM_POS_ERRADA]),
+    format('Elementos certos na posicao errada: ~q .', [ELM_POS_ERRADA]),
     nl,
-    ansi_format([bold,fg(green)],'Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
+    format('Elementos certos na posicao certa: ~q .', [ELM_POS_CORRETA]),
     nl.
 
-partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, TENTATIVAS) :-
+partida(TAM_PALAVRA, PALAVRA, TENTATIVAS) :-
 	ler_palavra(TAM_PALAVRA, PALAVRA_T),
-    validar_palavra(TAM_PALAVRA, PALAVRA_T, TIPO),
 	palavra_corresp(PALAVRA_T, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
     mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA),
     validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA),
@@ -156,9 +155,9 @@ partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, TENTA
             RESTO_TENTATIVAS is TENTATIVAS - 1,
             format('Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [RESTO_TENTATIVAS]),
             nl,
-    	    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, RESTO_TENTATIVAS).
+    	    partida(TAM_PALAVRA, PALAVRA, RESTO_TENTATIVAS).
 
-jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
+jogar() :-
     format('Olá, jogador!'),
     nl,
     format('Preparado para uma partida?'),
@@ -169,20 +168,20 @@ jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
     nl,
     format('Dica! Ela é do tipo: ~q .', [TIPO]),
     nl,
-    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, 6),
+    partida(TAM_PALAVRA, PALAVRA, 6),
     format(' PALAVRA CORRETA: ~q .', [PALAVRA]),
     nl,
     nl,
-    jogar_novamente(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA).
+    jogar_novamente().
 
-jogar_novamente(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
+jogar_novamente() :-
     write('Você gostaria de jogar novamente? (sim ou nao)'),
     read(RESPOSTA),
     RESPOSTA = 'nao' ->
         !;
-        jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA).
+        jogar().
 
 main :-
-    jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+    jogar(),
     halt(0) .
     
