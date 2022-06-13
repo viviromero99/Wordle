@@ -97,20 +97,21 @@ validar_tamanho(PALAVRA, TAMANHO) :-
     len(PALAVRA_LIST, RESPOSTA_LEN),
     RESPOSTA_LEN =:= TAMANHO .
 
-validar_dicionario(RESPOSTA, TAMANHO) :-
-    word(_TIPO, RESPOSTA, TAMANHO, ID),
+validar_dicionario(PALAVRA, TAMANHO) :-
+    atom_string(PALAVRA_ATOM, PALAVRA),
+    word(_TIPO, PALAVRA_ATOM, TAMANHO, ID),
     ID > 0 .
 
-validar_palavra(RESPOSTA, PALAVRA, TAMANHO) :-
+validar_palavra(PALAVRA, TAMANHO) :-
     validar_tamanho(PALAVRA, TAMANHO),
-    validar_dicionario(RESPOSTA, TAMANHO) .
+    validar_dicionario(PALAVRA, TAMANHO) .
 
 ler_palavra(TAMANHO, PALAVRA) :-
-    format('Qual seu palpite?'),
     nl,
-    read(RESPOSTA),
-    atom_string(RESPOSTA, PALAVRA),
-    validar_palavra(RESPOSTA, PALAVRA, TAMANHO) ->
+    format("Qual seu palpite? ~n"),
+    read_line_to_string(user_input, RESPOSTA_CODES),
+    string_lower(RESPOSTA_CODES, PALAVRA),
+    validar_palavra(PALAVRA, TAMANHO) ->
         ! ;
         nl,
         format('Palavra contém tamanho diferente de ~q ou não consta no nosso dicionario.', [TAMANHO]),
@@ -133,7 +134,6 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     		VITORIA is 1 .
 			
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
-    nl,
     ansi_format([bold,fg(red)],'Elementos errados: ~q ', [ELM_ERRADO]),
     nl,
     ansi_format([bold,fg(yellow)],'Elementos certos na posicao errada: ~q ', [ELM_POS_ERRADA]),
