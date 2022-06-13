@@ -1,54 +1,4 @@
-% Palavras por Tamanho
-
-% Tamanho 4
-len_palavra(4, seta).
-len_palavra(4, roda).
-len_palavra(4, vela).
-len_palavra(4, alvo).
-len_palavra(4, gato).
-
-% Tamanho 5
-len_palavra(5, terra).
-len_palavra(5, trapo).
-len_palavra(5, visor).
-len_palavra(5, capuz).
-len_palavra(5, vento).
-
-% Tamanho 6
-len_palavra(6, hostil).
-len_palavra(6, pressa).
-len_palavra(6, nativo).
-len_palavra(6, forjar).
-len_palavra(6, aurora).
-
-% Tamanho 7
-len_palavra(7, cultura).
-len_palavra(7, ousadia).
-len_palavra(7, mancebo).
-len_palavra(7, advento).
-len_palavra(7, conexao).
-
-% Identificadores das Palavras
-id_palavra(0, seta).
-id_palavra(1, roda).
-id_palavra(2, vela).
-id_palavra(3, alvo).
-id_palavra(4, gato).
-id_palavra(0, terra).
-id_palavra(1, trapo).
-id_palavra(2, visor).
-id_palavra(3, capuz).
-id_palavra(4, vento).
-id_palavra(0, hostil).
-id_palavra(1, pressa).
-id_palavra(2, nativo).
-id_palavra(3, forjar).
-id_palavra(4, aurora).
-id_palavra(0, cultura).
-id_palavra(1, ousadia).
-id_palavra(2, mancebo).
-id_palavra(3, advento).
-id_palavra(4, conexao).
+:- consult(dicionario).
 
 % Converte uma lista para String
 str_toList(STR, LIST) :- atom_chars(STR, LIST).
@@ -112,10 +62,9 @@ elemento_pos_errado(PALAVRA_T, ELM_ERRADO, ELM_POS_CORRETA, ELM_LIST) :-
     !.
 
 % Gera palavra do dia
-palavra_dia(TAM, PALAVRA)  :-
-	len_palavra(TAM, PALAVRA),
-	random_between(0,5,ID),
-	id_palavra(ID, PALAVRA),
+palavra_dia(TAM, PALAVRA, TIPO)  :-
+	random_between(1,405,ID),
+    word(TIPO, PALAVRA, TAM, ID),
 	!.
 
 % Realiza a verificacao da entrada
@@ -138,10 +87,6 @@ ler_tam_palavra(TAM_PALAVRA) :-
   	nl,
     ler_tam_palavra(TAM_PALAVRA).
 
-
-intervalo(TAM_PALAVRA) :-
-    4 =< TAM_PALAVRA, 7 >= TAM_PALAVRA.
-
 ler_palavra(TAMANHO, PALAVRA) :-
     format('Qual seu palpite?'),
     nl,
@@ -151,8 +96,9 @@ ler_palavra(TAMANHO, PALAVRA) :-
    	atom_string(RESPOSTA, PALAVRA),
     str_toList(PALAVRA, PALAVRA_LIST),
     len(PALAVRA_LIST, RESPOSTA_LEN),
-    RESPOSTA_LEN =:= TAMANHO -> ! ;
-    	format('Palavra deve ter tamanho ~q .', [TAMANHO]),
+    RESPOSTA_LEN =:= TAMANHO ->
+        ! ;
+        format('Palavra deve ter tamanho ~q .', [TAMANHO]),
     	nl,
     	format('Tente novamente!'),
     	nl,
@@ -199,14 +145,22 @@ jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA) :-
     format('Preparado para uma partida?'),
     nl,
     ler_tam_palavra(TAM_PALAVRA),
-    palavra_dia(TAM_PALAVRA, PALAVRA),
+    palavra_dia(TAM_PALAVRA, PALAVRA, TIPO),
     format('Obaaa! Já temos uma palavra para você!'),
     nl,
-    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+    format('Dica! Ela é do tipo: ~q .', [TIPO]),
     nl,
+    partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
     format(' PALAVRA CORRETA: ~q .', [PALAVRA]),
     nl,
     nl,
     nl,
     nl.
 
+main :-
+    jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+    write('Você gostaria de jogar novamente? (sim ou nao)'),
+    read(RESPOSTA),
+    RESPOSTA =:= 'sim' ->
+        jogar(PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
+        !.
