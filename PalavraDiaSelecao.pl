@@ -106,6 +106,18 @@ ler_palavra(TAMANHO, PALAVRA) :-
     	nl,
     	ler_palavra(TAMANHO, PALAVRA).
 
+validar_palavra(TAMANHO, PALAVRA, TIPO) :-
+    ID is 0,
+    word(TIPO, PALAVRA, TAMANHO, ID),
+    ID > 0 -> 
+        ! ;
+        format('Essa palavra não existe no dicionario.'),
+        nl,
+        format('Tente novamente!'),
+        nl,
+        nl,
+        ler_palavra(TAMANHO, PALAVRA).
+
 validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     len(ELM_ERRADO, ELM_ERRADO_LEN),
 	ELM_ERRADO_LEN > 0 ->
@@ -131,6 +143,7 @@ mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
 
 partida(TAM_PALAVRA, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA, TENTATIVAS) :-
 	ler_palavra(TAM_PALAVRA, PALAVRA_T),
+    validar_palavra(TAM_PALAVRA, PALAVRA_T, TIPO),
 	palavra_corresp(PALAVRA_T, PALAVRA, ELM_ERRADO, ELM_POS_CORRETA, ELM_POS_ERRADA),
     mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA),
     validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA),
