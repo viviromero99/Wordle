@@ -1,7 +1,7 @@
 # Wordle
 Jogo inspirado no Wordle, de acertar palavras em Prolog, mas sem a restrição de ser uma palavra por dia.
 
-Foram criadas 4 listas de palavras, sem acentuação com 405 palavras cada, distribuídas nas categorias:
+Foi criada uma lista dicionário de palavras, sem acentuação, com 405 palavras para cada tamanho, distribuídas nas categorias:
 
  - verbo
  - local
