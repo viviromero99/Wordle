@@ -17,7 +17,7 @@ Foram criadas 4 listas de palavras, sem acentuação com 405 palavras cada, dist
 
 # Instruções para jogar
 
- Para jogar nosso jogo, basta executar no terminal o comando " swipl -s PalavraDiaSelecao.pl -t main " na raiz do projeto e começar a adivinhar palavras!
+ Para jogar nosso jogo, basta executar no terminal o comando " swipl PalavraDiaSelecao.pl " na raiz do projeto e começar a adivinhar palavras!
 
 
 # Como jogar
