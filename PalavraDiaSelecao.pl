@@ -83,17 +83,20 @@ intervalo(TAM_PALAVRA) :-
 
 % Faz a leitura do tamanho da palavra.
 ler_tam_palavra(TAM_PALAVRA) :-
+  nl,
   format('Qual o tamanho da palavra que gostaria de adivinhar?'),
   nl,
-  format('Lembrando as opcoes sao 4,5,6 e 7'),
+  format('Lembrando as opcoes sao 4,5,6 ou 7 '),
   nl,
   read_string(user_input, ".", "\r\t\n ", _SEP, TAM_STRING),
   number_string(TAM_PALAVRA, TAM_STRING),
   integer(TAM_PALAVRA),
   intervalo(TAM_PALAVRA) -> 
     ! ;
-    format('Essa opcão não existe.'),
+    nl,
+    ansi_format([bold,fg(cyan)],'Essa opcão não existe. ~i', [TAM_PALAVRA]),
   	nl,
+    nl,
     ler_tam_palavra(TAM_PALAVRA).
 
 % Valida que a palavra recebida respeita o tamanho definido e está no dicionário.
@@ -114,9 +117,9 @@ ler_palavra(TAMANHO, PALAVRA) :-
     validar_palavra(PALAVRA, TAMANHO) ->
         ! ;
         nl,
-        format('Palavra contém tamanho diferente de ~q ou não consta no nosso dicionario.', [TAMANHO]),
+        ansi_format([bold,fg(cyan)],'Palavra contém tamanho diferente de ~q ou não consta no nosso dicionario.', [TAMANHO]),
         nl,
-        format('Tente novamente!'),
+        ansi_format([bold,fg(cyan)],'Tente novamente! ~i', [TAMANHO]),
         nl,
         ler_palavra(TAMANHO, PALAVRA) .
 
@@ -130,12 +133,14 @@ validar_partida(ELM_ERRADO, ELM_POS_ERRADA, VITORIA) :-
     	ELM_POS_ERRADA_LEN > 0 -> 
     		VITORIA is 0,
             ! ;
-    		format('Parabéns! Você acertou a palavra!'),
+            nl,
+    		ansi_format([bold,fg(green)],'Parabéns! Você acertou a palavra! ~i', [VITORIA]),
     		nl,
     		VITORIA is 1 .
 
 % Imprime o placar na tela.		
 mostrar_placar(ELM_ERRADO, ELM_POS_ERRADA, ELM_POS_CORRETA) :-
+    nl,
     ansi_format([bold,fg(red)],'Elementos errados: ~q ', [ELM_ERRADO]),
     nl,
     ansi_format([bold,fg(yellow)],'Elementos certos na posicao errada: ~q ', [ELM_POS_ERRADA]),
@@ -153,11 +158,13 @@ partida(TAM_PALAVRA, PALAVRA, TENTATIVAS) :-
     VITORIA =:= 1 ->
         ! ;
         TENTATIVAS =:= 1 ->
-            format('Poxa, você errou a palavra e não restam mais tentativas!'),
+            nl,
+            ansi_format([bold,fg(red)],'Poxa, você errou a palavra e não restam mais tentativas! ~i', [TENTATIVAS]),
             nl,
             !;
+            nl,
             RESTO_TENTATIVAS is TENTATIVAS - 1,
-            format('Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [RESTO_TENTATIVAS]),
+            ansi_format([bold,fg(255,140,0)],'Poxa, você errou a palavra! Ainda restam ~q tentativas, tente novamente!', [RESTO_TENTATIVAS]),
             nl,
             partida(TAM_PALAVRA, PALAVRA, RESTO_TENTATIVAS).
 
@@ -165,12 +172,14 @@ partida(TAM_PALAVRA, PALAVRA, TENTATIVAS) :-
 jogar() :-
     ler_tam_palavra(TAM_PALAVRA),
     palavra_dia(TAM_PALAVRA, PALAVRA, TIPO),
-    format('Obaaa! Já temos uma palavra para você!'),
     nl,
-    format('Dica! Ela é do tipo: ~q.', [TIPO]),
+    ansi_format([bold,fg(blue)],'Obaaa! Já temos uma palavra para você! ~i', [TAM_PALAVRA]),
+    nl,
+    ansi_format([bold,fg(blue)],'Dica! Ela é do tipo: ~q.', [TIPO]),
     nl,
     partida(TAM_PALAVRA, PALAVRA, 6),
-    format(' PALAVRA CORRETA: ~q.', [PALAVRA]),
+    nl,
+    ansi_format([bold,fg(blue)],' PALAVRA CORRETA: ~q.', [PALAVRA]),
     nl,
     nl,
     write('Você gostaria de jogar novamente? (sim ou nao)'),
@@ -181,11 +190,30 @@ jogar() :-
         ! .
 
 main :-
+    wordleTitulo,
+    nl,
+    nl,
     format('Olá, jogador!'),
     nl,
-    format('Preparado para jogar?'),
+    format('Preparado para adivinhar?'),
     nl,
     jogar(),
     halt(0) .
 
 :- initialization(main) .
+
+wordleTitulo:- 
+  nl,
+  format(' ###############################################################################'),
+  nl,
+  format(' #                                                                             #'),
+  nl,
+  format(' #                           BEM-VINDO   AO                                    #'),
+  nl,
+  format(' #                                                                             #'),
+  nl,
+  format(' #                            W O R D L E                                      #'),
+  nl,
+  format(' #                                                                             #'),
+  nl,
+  format(' ###############################################################################').
